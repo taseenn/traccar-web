@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { makeStyles } from 'tss-react/mui';
 import {
   IconButton, Tooltip, Avatar, ListItemAvatar, ListItemText, ListItemButton,
-  Typography,
+  Typography,Checkbox
 } from '@mui/material';
 import BatteryFullIcon from '@mui/icons-material/BatteryFull';
 import BatteryChargingFullIcon from '@mui/icons-material/BatteryChargingFull';
@@ -53,7 +53,7 @@ const useStyles = makeStyles()((theme) => ({
   },
 }));
 
-const DeviceRow = ({ devices, index, style }) => {
+const DeviceRow = ({ devices, index, style, selectedDevices, setSelectedDevices  }) => {
   const { classes } = useStyles();
   const dispatch = useDispatch();
   const t = useTranslation();
@@ -80,6 +80,15 @@ const DeviceRow = ({ devices, index, style }) => {
         <span className={classes[getStatusColor(item.status)]}>{status}</span>
       </>
     );
+  };
+
+   const toggleDevice = (id) => {
+    setSelectedDevices(prev => {
+      const updated = prev.includes(id)
+        ? prev.filter(i => i !== id)
+        : [...prev, id];
+        return updated;
+    });
   };
 
   return (
@@ -149,6 +158,12 @@ const DeviceRow = ({ devices, index, style }) => {
             )}
           </>
         )}
+        <Checkbox
+          edge="end"
+          checked={selectedDevices?.includes(item.id)}
+          onClick={(e) => e.stopPropagation()}
+          onChange={() => toggleDevice(item.id)}
+        />
       </ListItemButton>
     </div>
   );

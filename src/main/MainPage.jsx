@@ -16,6 +16,7 @@ import useFilter from './useFilter';
 import MainToolbar from './MainToolbar';
 import MainMap from './MainMap';
 import { useAttributePreference } from '../common/util/preferences';
+import fetchOrThrow from '../common/util/fetchOrThrow';
 
 const useStyles = makeStyles()((theme) => ({
   root: {
@@ -102,6 +103,24 @@ const MainPage = () => {
 
   useFilter(keyword, filter, filterSort, filterMap, positions, setFilteredDevices, setFilteredPositions);
 
+  const [selectedDevices, setSelectedDevices] = useState([]);
+    const [removing, setRemoving] = useState(false);
+
+    const handleRemoveResult = async () => {
+    try {
+      if (selectedDevices?.length > 0) {
+        for (const id of selectedDevices) {
+          await fetchOrThrow(`/api/devices/${id}`, { method: 'DELETE' });
+        }
+  
+        const response = await fetchOrThrow('/api/devices');
+        dispatch(devicesActions.refresh(await response.json()));
+      }
+    } finally {
+      setSelectedDevices([]);
+    }
+  };
+
   return (
     <div className={classes.root}>
       {desktop && (
@@ -125,6 +144,10 @@ const MainPage = () => {
             setFilterSort={setFilterSort}
             filterMap={filterMap}
             setFilterMap={setFilterMap}
+            selectedDevices={selectedDevices}
+            handleRemoveResult={handleRemoveResult}
+            removing={removing}
+            setRemoving={setRemoving}
           />
         </Paper>
         <div className={classes.middle}>
@@ -138,7 +161,7 @@ const MainPage = () => {
             </div>
           )}
           <Paper square className={classes.contentList} style={devicesOpen ? {} : { visibility: 'hidden' }}>
-            <DeviceList devices={filteredDevices} />
+            <DeviceList devices={filteredDevices} selectedDevices={selectedDevices} setSelectedDevices={setSelectedDevices}/>
           </Paper>
         </div>
         {desktop && (
@@ -153,7 +176,7 @@ const MainPage = () => {
           deviceId={selectedDeviceId}
           position={selectedPosition}
           onClose={() => dispatch(devicesActions.selectId(null))}
-          desktopPadding={theme.dimensions.drawerWidthDesktop}
+          desktopPadding={removing ? theme.dimensions.cardWidthDesktop : theme.dimensions.drawerWidthDesktop}
         />
       )}
     </div>
