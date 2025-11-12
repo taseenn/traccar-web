@@ -13,6 +13,7 @@ import TodayIcon from '@mui/icons-material/Today';
 import SendIcon from '@mui/icons-material/Send';
 import DnsIcon from '@mui/icons-material/Dns';
 import HelpIcon from '@mui/icons-material/Help';
+import ArticleIcon from '@mui/icons-material/Article';
 import PaymentIcon from '@mui/icons-material/Payment';
 import CampaignIcon from '@mui/icons-material/Campaign';
 import CalculateIcon from '@mui/icons-material/Calculate';
@@ -72,6 +73,12 @@ const SettingsMenu = () => {
               link="/geofences"
               icon={<DrawIcon />}
               selected={location.pathname.startsWith('/settings/geofence')}
+            />
+            <MenuItem
+              title="XmlFile"
+              link="/settings/xml"
+              icon={<ArticleIcon />}
+              selected={location.pathname === '/settings/xml'}
             />
             {!features.disableGroups && (
               <MenuItem
